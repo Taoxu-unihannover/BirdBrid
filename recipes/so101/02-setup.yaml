@@ -1,0 +1,32 @@
+id: 02-setup
+title: 环境与接线
+order: 2
+category: sim2real
+description: 准备客户端、识别串口与双相机，让每台设备各就各位。
+duration: 35 分钟
+guide: guides/02-setup.md
+steps:
+- title: 断电接线
+  where: 本机 · 硬件
+  note: 主臂 5V、从臂 12V，先断电接线再通电；两台相机分别确认 wrist / front。
+- title: 导入并启动客户端
+  where: 本机 · 宿主机
+  note: 离线镜像由教师提供。已有容器时用 sudo docker start so101-client，不要重复创建。
+  command: "mkdir -p ~/so101-lab/scripts\n# 从 BridSimReal 仓库根目录执行\ncp runtime/* ~/so101-lab/scripts/\n\
+    sudo docker load -i so101-client.tar\nsudo docker run -d --name so101-client --privileged\
+    \ --network host \\\n  -v ~/so101-lab:/root/so101-lab \\\n  -v ~/.cache/huggingface:/root/.cache/huggingface\
+    \ \\\n  so101-client:latest sleep infinity"
+- title: 进入容器
+  where: 本机 · 宿主机
+  note: ''
+  command: sudo docker exec -it so101-client bash
+- title: 识别硬件
+  where: 本机 · 客户端容器
+  note: 识别后把实际结果填写到场景面板；不要直接沿用默认校准 ID。
+  command: 'lerobot-find-port
+
+    lerobot-find-cameras opencv'
+
+prerequisite_courses: ["01-overview"]
+recommended_courses: []
+prerequisite_note: 先了解实训任务与设备分工，再准备环境和接线。

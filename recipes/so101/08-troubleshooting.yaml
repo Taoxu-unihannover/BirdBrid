@@ -1,0 +1,25 @@
+id: 08-troubleshooting
+title: 故障排查
+order: 8
+category: sim2real
+description: 按硬件、网络、仿真与策略分层定位常见问题。
+duration: 按需查阅
+guide: guides/08-troubleshooting.md
+steps:
+- title: 检查硬件
+  where: 本机 · 客户端容器
+  note: ''
+  command: 'ls -l /dev/ttyACM* /dev/ttyUSB*
+
+    lerobot-find-cameras opencv'
+- title: 检查服务监听
+  where: '{compute} · 宿主机'
+  note: 同时检查上方显示的工位端口、后端端口和主臂隧道端口。
+  command: ss -lnt
+- title: 查找对应症状
+  where: 阅读课程
+  note: 下方完整排查指南保留原课程的症状、原因与处理办法。
+
+prerequisite_courses: []
+recommended_courses: ["02-setup", "03-calibration", "06-inference"]
+prerequisite_note: 本课为按需查阅的排错手册，无必修前置课程；可结合正在进行的实训课程定位问题。

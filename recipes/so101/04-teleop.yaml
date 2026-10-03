@@ -1,0 +1,27 @@
+id: 04-teleop
+title: 主从遥操作
+order: 4
+category: sim2real
+description: 从主从跟随开始，练习通过双相机完成抓取。
+duration: 30 分钟
+guide: guides/04-teleop.md
+steps:
+- title: 对齐姿态
+  where: 本机 · 硬件
+  note: 启动前主从姿态尽量一致；清空活动区域，准备随时 Ctrl+C。
+- title: 启动主从跟随
+  where: 本机 · 客户端容器
+  note: ''
+  command: "lerobot-teleoperate --robot.type=so101_follower \\\n  --robot.port={{robot}}\
+    \ --robot.id={{robotId}} \\\n  --teleop.type=so101_leader \\\n  --teleop.port={{teleop}}\
+    \ --teleop.id={{teleopId}}"
+- title: 使用双相机遥操作
+  where: 本机 · 客户端容器
+  note: 先停止上一条遥操作进程，再启动带相机版本；只看相机画面完成练习。
+  command: "lerobot-teleoperate --robot.type=so101_follower \\\n  --robot.port={{robot}}\
+    \ --robot.id={{robotId}} \\\n  --teleop.type=so101_leader \\\n  --teleop.port={{teleop}}\
+    \ --teleop.id={{teleopId}} \\\n  --display_data=true --robot.cameras={{cameras}}"
+
+prerequisite_courses: ["02-setup", "03-calibration"]
+recommended_courses: []
+prerequisite_note: 确认主从臂已完成校准，并能识别串口和两台相机。

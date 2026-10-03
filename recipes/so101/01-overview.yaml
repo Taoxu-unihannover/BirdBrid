@@ -1,0 +1,18 @@
+id: 01-overview
+title: 认识 Sim-to-Real
+order: 1
+category: sim2real
+description: 从真实设备、仿真环境到策略服务，建立完整的实训路线。
+duration: 20 分钟
+guide: guides/01-overview.md
+steps:
+- title: 认识任务与链路
+  where: 阅读课程
+  note: 先阅读课程目标和工作流。集中算力模式下，本机负责串口、相机和真机执行；服务器负责仿真与模型。
+- title: 确认当前场景
+  where: 工位信息
+  note: 上方选择工位 ID 和算力部署位置；校准 ID 必须使用每台物理机械臂自己的持久标识。
+
+prerequisite_courses: []
+recommended_courses: []
+prerequisite_note: 本课是系列入口，无前置课程，可直接开始。

@@ -1,0 +1,15 @@
+id: appendix
+title: 术语与扩展阅读
+order: 10
+category: sim2real
+description: 常用术语、策略路线和课程参考资料。
+duration: 按需查阅
+guide: guides/appendix.md
+steps:
+- title: 查阅术语与策略
+  where: 阅读课程
+  note: 域随机化、协同训练、Cosmos 增强、SAGE 与 GapONet；扩展内容不代表已经完成实训验证。
+
+prerequisite_courses: []
+recommended_courses: ["01-overview"]
+prerequisite_note: 本课为术语与参考资料，无必修前置课程，可随时查阅。

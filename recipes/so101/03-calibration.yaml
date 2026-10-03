@@ -1,0 +1,30 @@
+id: 03-calibration
+title: 机械臂校准
+order: 3
+category: sim2real
+description: 完成主臂和从臂的中位偏移与运动范围校准。
+duration: 35 分钟
+guide: guides/03-calibration.md
+steps:
+- title: 校准主臂
+  where: 本机 · 客户端容器
+  note: 托住主臂；需要重新校准时输入 c，六轴逐一走完整机械行程。
+  command: "lerobot-calibrate --teleop.type=so101_leader \\\n  --teleop.port={{teleop}}\
+    \ --teleop.id={{teleopId}}"
+- title: 校准从臂
+  where: 本机 · 客户端容器
+  note: 腕旋转关节必须居中，线缆不能挡住机械端点。
+  command: "lerobot-calibrate --robot.type=so101_follower \\\n  --robot.port={{robot}}\
+    \ --robot.id={{robotId}}"
+- title: 校准结果检查
+  where: 本机 · 客户端容器
+  note: 此辅助脚本检查从臂，使用 ROBOT_ID / ROBOT_PORT 和参考统计；主臂检查需通过校准日志及小幅跟随实测确认。
+  command: 'export TELEOP_PORT={{teleop}} TELEOP_ID={{teleopId}}
+
+    export ROBOT_PORT={{robot}} ROBOT_ID={{robotId}}
+
+    python /root/so101-lab/scripts/so101_check_calibration.py'
+
+prerequisite_courses: ["02-setup"]
+recommended_courses: []
+prerequisite_note: 先完成接线、客户端环境和串口识别，再进行机械臂校准。

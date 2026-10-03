@@ -1,0 +1,25 @@
+id: 07-real-eval
+title: 真机策略评估
+order: 7
+category: sim2real
+description: 让真实机械臂调用工位服务，观察抓取与放置表现。
+duration: 35 分钟
+guide: guides/07-real-eval.md
+steps:
+- title: 布置工作区
+  where: 本机 · 硬件
+  note: 确认校准、相机映射和照明；摆好试管与试管架，清空运动范围。先启动后端和前端壳。
+- title: 启动真机评估
+  where: 本机 · 客户端容器
+  note: 客户端镜像必须包含 GR00T PolicyClient、LeRobot 和相关依赖；先观察初始姿态与首步动作。
+  command: "cd /root/so101-lab/scripts\npython so101_eval.py --robot.type=so101_follower\
+    \ \\\n  --robot.port={{robot}} --robot.id={{robotId}} \\\n  --robot.cameras={{cameras}}\
+    \ \\\n  --policy_host={{host}} --policy_port={{port}} \\\n  --lang_instruction=\"\
+    Pick up the vial and place it in the yellow rack\" --rerun True"
+- title: 安全停止
+  where: 本机 · 客户端终端
+  note: 先 Ctrl+C 停止机器人 client，再按需停止前端壳和后端。记录每轮成功情况与失败原因。
+
+prerequisite_courses: ["03-calibration", "04-teleop", "06-inference"]
+recommended_courses: ["05-sim-teleop"]
+prerequisite_note: 确认机械臂校准、主从跟随和推理服务正常后，再开展真机策略评估。

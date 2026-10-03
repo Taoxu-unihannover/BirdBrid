@@ -1,0 +1,48 @@
+id: 05-sim-teleop
+title: 仿真遥操作与采集
+order: 5
+category: sim2real
+description: 把主臂动作接入 Isaac Sim，观看仿真并理解示教采集。
+duration: 40 分钟
+guide: guides/05-sim-teleop.md
+steps:
+- title: 启动主臂读取服务
+  where: 本机 · 客户端容器
+  note: 填写真实存在的主臂校准 JSON；该进程保持运行。
+  command: 'cd /root/so101-lab/scripts
+
+    python3 -u leader_server.py --serial {{teleop}} --calibration {{calibration}}
+    --port 18766'
+- title: 建立主臂隧道
+  where: '{compute} · 宿主机'
+  note: 在服务器宿主机执行，连接学员笔记本；同一服务器上的每个工位需不同隧道端口。
+  command: "ssh -N -o ExitOnForwardFailure=yes -o ServerAliveInterval=10 \\\n  -o\
+    \ ServerAliveCountMax=3 -L 127.0.0.1:{{tunnel}}:127.0.0.1:18766 {{user}}@{{client}}"
+  modes:
+  - remote
+- title: 启动仿真
+  where: '{compute} · 已准备的仿真容器'
+  note: 集中模式使用教师分配的隧道端口；仿真镜像需支持网络输入。
+  command: "cd /workspace/Sim-to-Real-SO-101-Workshop\n/isaac-sim/python.sh -m sim_to_real_so101.scripts.lerobot_agent\
+    \ \\\n  --task Lerobot-So101-Teleop-Vials-To-Rack --num_envs 1 \\\n  --robot_id\
+    \ {{robotId}} --headless --livestream 1 --leader_tcp_port {{tunnel}}"
+  modes:
+  - remote
+- title: 启动本机仿真
+  where: 本机 · 已准备的仿真容器
+  note: 本机使用 network 镜像和 host 网络，直接连接主臂服务，不需要 SSH 隧道。需兼容的 NVIDIA GPU 和已部署的 Isaac Sim。
+  command: "cd /workspace/Sim-to-Real-SO-101-Workshop\n/isaac-sim/python.sh -m sim_to_real_so101.scripts.lerobot_agent\
+    \ \\\n  --task Lerobot-So101-Teleop-Vials-To-Rack --num_envs 1 \\\n  --robot_id\
+    \ {{robotId}} --headless --livestream 1 --leader_tcp_port 18766"
+  modes:
+  - local
+- title: 观看与跟随检查
+  where: 本机 · 浏览器
+  note: 使用下方仿真入口。逐轴小幅移动，按 R 重置。多工位串流必须由教师配置匹配的 Isaac Sim 信令/媒体端口，网页端口本身不提供隔离。
+- title: 数据采集边界
+  where: 阅读课程
+  note: 原课程 POC 只验证遥操作观看与跟随；录制、转换数据集、训练的完整闭环尚未验证，按教师指引进行。
+
+prerequisite_courses: ["02-setup", "03-calibration", "04-teleop"]
+recommended_courses: []
+prerequisite_note: 先完成设备准备、校准与真机主从遥操作，再把主臂动作接入仿真。教师须事先完成仿真服务部署，参见《服务器部署与复现》。

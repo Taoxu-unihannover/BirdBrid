@@ -1,0 +1,41 @@
+id: 09-server-deploy
+title: 服务器部署与复现
+order: 9
+category: sim2real
+description: 部署共享或本机 GPU 后端，为工位提供算力。
+duration: 教师 / 复现者
+guide: guides/09-server-deploy.md
+steps:
+- title: 准备离线资源
+  where: '{compute} · 宿主机'
+  note: 准备 so101-infer:latest、so101-sim:network、so101-viewer 镜像和模型权重；镜像和权重不随仓库分发。
+- title: 准备运行脚本
+  where: '{compute} · 宿主机'
+  note: ''
+  command: 'mkdir -p ~/so101-lab/scripts
+
+    # 从本仓库根目录执行
+
+    cp runtime/* ~/so101-lab/scripts/'
+- title: 启动推理容器
+  where: '{compute} · 宿主机'
+  note: 高级配置中的宿主机模型目录必须真实存在，挂载到 /workspace/models。镜像必须包含 GR00T 环境和模型依赖。
+  command: "sudo docker run -d --name so101-infer --network host --gpus all --ipc=host\
+    \ \\\n  -v {{modelRoot}}:/workspace/models:ro \\\n  -v ~/so101-lab/scripts:/workspace/deploy\
+    \ -w /workspace/deploy \\\n  --entrypoint bash so101-infer:latest -c \"sleep infinity\""
+- title: 进入推理容器
+  where: '{compute} · 宿主机'
+  note: ''
+  command: sudo docker exec -it -w /workspace/deploy so101-infer bash
+- title: 启动批处理引擎
+  where: '{compute} · 推理容器 /workspace/deploy'
+  note: 模型路径是容器内路径；引擎保持运行，另开终端按第 6 课启动各工位前端壳。
+  command: "/Isaac-GR00T/.venv/bin/python run_batched_server.py \\\n  --model-path\
+    \ {{model}} --port {{backend}} --max-batch 8 --wait-ms 6"
+- title: 仿真与串流部署
+  where: 阅读课程
+  note: 下方保留仿真镜像、查看器部署和端口说明。共享服务器多仿真实例需要教师事先完成信令/媒体隔离及 GPU 容量验证，本配方不自动创建多实例。
+
+prerequisite_courses: ["01-overview", "02-setup"]
+recommended_courses: []
+prerequisite_note: 面向教师与复现者：先理解系统分工并熟悉容器环境，再部署仿真和推理服务。学员无需先完成本课。
