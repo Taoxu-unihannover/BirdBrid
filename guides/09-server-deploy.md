@@ -13,24 +13,18 @@
 | `so101-viewer` | 网页查看器（串流到 8210） | 619MB | `so101-viewer.tar` |
 | `so101-infer` | GR00T 推理 | 80.5GB | `so101-infer.tar` |
 
-## 二、加载镜像并改名
+## 二、加载镜像
 
-在（新的）服务器上，把 tar 加载进 Docker，再把打包时遗留的旧名重命名成上表的规范名：
+在（新的）服务器上，把 tar 加载进 Docker。tar 已按规范名导出，加载后即为规范名，无需再改名：
 
 ```bash
 sudo docker load -i 镜像存档/so101-sim-network.tar
 sudo docker load -i 镜像存档/so101-sim-usb.tar
 sudo docker load -i 镜像存档/so101-viewer.tar
 sudo docker load -i 镜像存档/so101-infer.tar
-
-# 把早期打包留下的旧名改成上面的规范名
-sudo docker tag teleop-poc:s3-jetson-20260927   so101-sim:network
-sudo docker tag teleop-poc:s3-local-20260927    so101-sim:usb
-sudo docker tag teleop-poc:web-viewer-20260927  so101-viewer:latest
-sudo docker tag real-robot:so101                so101-infer:latest
 ```
 
-加载并改名后执行 `docker images`，应能看到 `so101-sim`、`so101-viewer`、`so101-infer` 这几个规范名。
+加载后执行 `docker images`，应能看到 `so101-sim`、`so101-viewer`、`so101-infer` 这几个规范名。
 
 ## 三、启动容器（统一命名）
 
