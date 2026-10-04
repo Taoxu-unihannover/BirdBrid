@@ -60,36 +60,6 @@ sudo docker run -d --name so101-web \
   so101-viewer
 ```
 
-:::{admonition} 替代方案：web-viewer 在**宿主机**直接跑
-网页查看器只是个纯 Node.js 静态服务（619MB，不含 GPU、不含 Isaac Sim），不必非得用容器。若想少跑一个容器，可把它搬到宿主机，浏览器访问地址不变：
-
-1. 宿主机装 Node 22：
-
-   ```bash
-   curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
-   sudo apt-get install -y nodejs
-   ```
-
-2. 把镜像里已构建好的网页抽到宿主机（无需重新构建）：
-
-   ```bash
-   mkdir -p ~/so101-web
-   sudo docker create --name so101-web-tmp so101-viewer
-   sudo docker cp so101-web-tmp:/app/package.json ~/so101-web/
-   sudo docker cp so101-web-tmp:/app/node_modules   ~/so101-web/
-   sudo docker cp so101-web-tmp:/app/dist           ~/so101-web/
-   sudo docker rm so101-web-tmp
-   ```
-
-3. 宿主机启动：
-
-   ```bash
-   cd ~/so101-web && ./node_modules/.bin/vite preview --host --port 8210
-   ```
-
-这样仿真照常用容器（`so101-sim`），网页照常开 `http://<服务器IP>:8210`；容器总数就只剩 `so101-sim`（需要真机推理时再加 `so101-infer`）。
-:::
-
 ### 推理容器
 
 ```bash
