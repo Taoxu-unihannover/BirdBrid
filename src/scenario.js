@@ -1,7 +1,7 @@
-export const defaults = {station:'sz03',mode:'remote',server:'192.168.1.6',client:'192.168.1.103',user:'student-sz03',teleop:'/dev/ttyACM0',robot:'/dev/ttyACM1',teleopId:'leader-sz03',robotId:'follower-sz03',wrist:'0',front:'2',modelRoot:'/home/student/so101-models',model:'/workspace/models/aravindhs-NV/grootn16-finetune_sreetz-so101_teleop_vials_rack_left/checkpoint-10000',calibration:'/root/.cache/huggingface/lerobot/calibration/teleoperators/so101_leader/leader-sz03.json',viewer:'8203',tunnel:'18703',backend:'5500'};
+export const defaults = {station:'sz03',mode:'remote',server:'192.168.1.6',client:'192.168.1.103',user:'student-sz03',teleop:'/dev/ttyACM0',robot:'/dev/ttyACM1',teleopId:'leader-sz03',robotId:'follower-sz03',wrist:'0',front:'2',modelRoot:'/home/student/so101-models',model:'/workspace/models/aravindhs-NV/grootn16-finetune_sreetz-so101_teleop_vials_rack_left/checkpoint-10000',calibration:'/root/.cache/huggingface/lerobot/calibration/teleoperators/so101_leader/leader-sz03.json',viewer:'8210',tunnel:'18703',backend:'5500'};
 export function stationDefaults(station) {
  const n=Number(station.slice(2));
- return {user:`student-${station}`,teleopId:`leader-${station}`,robotId:`follower-${station}`,calibration:`/root/.cache/huggingface/lerobot/calibration/teleoperators/so101_leader/leader-${station}.json`,viewer:String(8200+n),tunnel:String(18700+n)};
+ return {user:`student-${station}`,teleopId:`leader-${station}`,robotId:`follower-${station}`,calibration:`/root/.cache/huggingface/lerobot/calibration/teleoperators/so101_leader/leader-${station}.json`,viewer:'8210',tunnel:String(18700+n)};
 }
 export function migrateConfig(saved={}) {
  const c={...defaults,...saved};
