@@ -11,3 +11,6 @@
 .step-tabs.tab-menu button .step-tab-number{display:inline-grid;place-items:center;vertical-align:middle;width:24px;height:24px;border-radius:50%;background:#e0e8e3;color:#778c7f;font-size:10px;margin-right:9px;opacity:1}
 .step-tabs.tab-menu button[aria-selected=true] .step-tab-number{background:#1b745b;color:#fff}
 @media(max-width:640px){.step-tabs.tab-menu button{flex-basis:158px;max-width:190px}.step-tabs.tab-menu{gap:6px}.step-tabs.tab-menu button:focus-visible{outline-offset:-3px}}
+/* Collapse the sidebar automatically when the reading area becomes narrow. */
+.compact-course-nav{display:none}
+@media(max-width:1000px){.lesson-layout{display:block}.lesson-layout .lesson-nav{display:none}.compact-course-nav{display:flex;align-items:center;gap:14px;color:var(--muted);font-size:12px;margin:0 0 24px}.compact-course-nav select{width:auto;max-width:100%;flex:1;background:white}}

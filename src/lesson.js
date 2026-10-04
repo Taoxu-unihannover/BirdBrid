@@ -16,7 +16,6 @@ export function lessonContent(recipe,c){
  const summary=sections.filter(s=>/关键要点|避坑清单|参考资源|求助顺序/.test(s.title));
  const steps=sections.filter(s=>s.title!=='学习目标'&&!summary.includes(s));
  const overview=recipe.id==='02-setup'?goals:(intro.filter(n=>n.tagName!=='DETAILS').map(n=>n.outerHTML).join('')+goals);
- const environment='<p>准备 Ubuntu 笔记本、Docker 以及教师提供的离线资源。根据设备在首页统一配置算力场景，并核对串口、相机和校准记录。所有 sim2real 课程共用这份配置。</p><p>端侧无 GPU 时使用集中服务器；本机 GPU 场景需准备兼容的 NVIDIA GPU、容器运行时和课程镜像。按后续步骤进入相应容器执行命令。</p>';
  let selected=steps;
  if(recipe.id==='05-sim-teleop'&&c.mode==='local')selected=steps.filter(s=>!s.title.includes('SSH 隧道'));
  for(const s of selected){
@@ -30,7 +29,7 @@ export function lessonContent(recipe,c){
    s.html=container.body.innerHTML+`<pre><code>${escape(command.command)}</code></pre><p><a class="simulation-link" target="_blank" rel="noopener" href="http://${escape(c.host)}:${c.viewer}">打开工位 ${escape(c.station)} 的仿真 ↗</a></p>`;
   }
  }
- return {preparation:[personalize(overview||`<p>${escape(recipe.description)}</p>`,c),dependencies+personalize(prerequisites?'<h3>设备与环境条件</h3>'+prerequisites:'',c),environment],steps:selected,notes:personalize(summary.map(s=>`<h3>${escape(s.title)}</h3>${s.html}`).join('')||'<p>操作完成后保存记录，按教师指引停止进程并整理设备。</p>',c)};
+ return {preparation:[personalize(overview||`<p>${escape(recipe.description)}</p>`,c),dependencies+personalize(prerequisites?'<h3>设备与环境条件</h3>'+prerequisites:'',c)],steps:selected,notes:personalize(summary.map(s=>`<h3>${escape(s.title)}</h3>${s.html}`).join('')||'<p>操作完成后保存记录，按教师指引停止进程并整理设备。</p>',c)};
 }
 
 export function personalize(html,c){
@@ -59,7 +58,7 @@ function applyCommands(html,recipe,c){
  const command=title=>commands.find(s=>s.title===title)?.command;
  for(const code of doc.querySelectorAll('pre code')){
   const text=code.textContent;let replacement;
-  if(recipe.id==='02-setup'&&text.includes('docker load'))replacement=command('导入并启动客户端');
+  if(recipe.id==='02-setup'&&text.includes('docker run -d --name so101-client'))replacement=command('启动客户端');
   if(recipe.id==='03-calibration'){
    if(text.includes('lerobot-calibrate'))replacement=command(text.includes('--teleop.type')?'校准主臂':'校准从臂');
    if(text.includes('python')&&text.includes('so101_check_calibration.py'))replacement=command('校准结果检查');

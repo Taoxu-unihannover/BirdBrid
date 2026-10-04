@@ -46,22 +46,18 @@ USB 只负责「通信」，**电机需要单独的电源才有力气动**。如
 
 ## 第二步：准备本机 LeRobot 环境（容器）
 
-你本机只需要 **LeRobot 客户端**环境，做校准、遥操作、评估和转发，**不加载 AI 模型、不需要显卡**。为避免现场联网装包受网络影响，这部分已经打包成**离线镜像** `so101-client`。你只需导入镜像、启动容器，之后所有 `lerobot-*` 命令都在容器里执行。
 
 :::{note}
 如果 `docker` 还没装，请先按教师指引安装并确保能用 `sudo docker`。进入容器后 `lerobot-find-cameras`、`lerobot-calibrate` 等命令能跑，就说明环境就绪，无需再装任何包。
 :::
 
-已有容器时，运行 `sudo docker start so101-client`，不要重复创建。首次使用时，在终端里执行：
 
 ```bash
 # 1) 建一个工作目录，本课程所有内容都放这里，避免散落在 home 目录下
-mkdir -p ~/so101-lab
+mkdir -p ~/so101-lab/scripts
+cp ~/so101-lab/BridSimReal/runtime/* ~/so101-lab/scripts/
 
-# 2) 导入离线镜像（只需一次；在 so101-client.tar 所在目录执行，或用完整路径）
-sudo docker load -i so101-client.tar
-
-# 3) 启动客户端容器（每次开机后启动一次即可）
+# 2) 启动客户端容器（每次开机后启动一次即可）
 sudo docker run -d --name so101-client \
   --privileged --network host \
   -v ~/so101-lab:/root/so101-lab \
@@ -75,7 +71,7 @@ sudo docker run -d --name so101-client \
 
 ### 进入容器
 
-之后每一步的命令，都先进入容器再执行：
+本节之后的命令，都在容器里执行
 
 ```bash
 sudo docker exec -it so101-client bash

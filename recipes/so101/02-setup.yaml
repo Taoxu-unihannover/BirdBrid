@@ -9,11 +9,11 @@ steps:
 - title: 断电接线
   where: 本机 · 硬件
   note: 主臂 5V、从臂 12V，先断电接线再通电；两台相机分别确认 wrist / front。
-- title: 导入并启动客户端
+- title: 启动客户端
   where: 本机 · 宿主机
   note: 离线镜像由教师提供。已有容器时用 sudo docker start so101-client，不要重复创建。
-  command: "mkdir -p ~/so101-lab/scripts\n# 从 BridSimReal 仓库根目录执行\ncp runtime/* ~/so101-lab/scripts/\n\
-    sudo docker load -i so101-client.tar\nsudo docker run -d --name so101-client --privileged\
+  command: "mkdir -p ~/so101-lab/scripts\ncp ~/so101-lab/BridSimReal/runtime/* ~/so101-lab/scripts/\n\
+    sudo docker run -d --name so101-client --privileged\
     \ --network host \\\n  -v ~/so101-lab:/root/so101-lab \\\n  -v ~/.cache/huggingface:/root/.cache/huggingface\
     \ \\\n  so101-client:latest sleep infinity"
 - title: 进入容器
