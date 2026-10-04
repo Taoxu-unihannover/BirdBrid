@@ -66,54 +66,19 @@ ssh -N -o ExitOnForwardFailure=yes \
 
 ## 第三步：启动仿真并观看
 
-仿真需**服务器上的容器**（这一步由教师/服务器操作，若教师已帮你起好，可直接跳到浏览器）：
+仿真吃显卡，所以跑在**服务器**上，下面这些命令也都在**服务器端**执行（**不是在你的笔记本上**）。如果教师已帮你把仿真起好，直接跳到本步末尾的浏览器链接查看画面即可。
 
 | 组件 | 作用 | 名称 |
 |---|---|---|
 | 仿真容器 | 跑 Isaac Sim + `lerobot_agent` | `so101-sim` |
-| 网页服务 | 把仿真画面串流到浏览器 8210（在**宿主机直跑**，不起容器） | — |
+| 网页服务 | 把仿真画面串流到浏览器（部署方式见[第 9 章](09-server-deploy.md)） | — |
 
-:::{note}
-这些命令**不是在你笔记本上执行**。`sim_to_real_so101` 模块和 `/workspace` 目录只存在于**仿真容器里**（靠镜像自带 `/isaac-sim/python.sh` 提供），宿主机上是没有的。
-:::
+启动仿真分两步，都在服务器上完成：
 
-### 1）启动仿真容器（服务器）
+1. **启动仿真容器**：镜像用 `so101-sim:network`（主臂接在你的笔记本上）；若主臂直接插在服务器 USB 上，改用 `so101-sim:usb`。
+2. **进入容器启动仿真**：先 `sudo docker exec -it so101-sim bash` 进入容器，再运行下面的命令。
 
-```bash
-sudo docker run -d --name so101-sim \
-  --privileged --network host --runtime nvidia \
-  -v /dev:/dev \
-  --entrypoint bash \
-  so101-sim:network \
-  -c "echo started && sleep infinity"
-```
-
-- 镜像 `so101-sim:network` 是「网络输入版」（主臂接在学员笔记本上）。
-- 若主臂**直接插在服务器 USB 上**，改用镜像 `so101-sim:usb`。
-
-### 2）进入仿真容器，启动仿真
-
-```bash
-sudo docker exec -it so101-sim bash
-
-cd /workspace/Sim-to-Real-SO-101-Workshop
-/isaac-sim/python.sh -m sim_to_real_so101.scripts.lerobot_agent \
-    --task Lerobot-So101-Teleop-Vials-To-Rack --num_envs 1 \
-    --robot_id R07252801 --headless --livestream 1 \
-    --leader_tcp_port 18765
-```
-
-:::{note}
-网页查看器**不在容器里跑**，而是作为宿主机上的一个 Node 静态服务（占 8210 端口）直接运行。教师在宿主机上启动该网页服务的方式见[第 9 章「web-viewer 宿主机直跑」](09-server-deploy.md)。
-:::
-
-然后在**你的浏览器**打开：
-
-```
-http://<服务器IP>:8210
-```
-
-你应该看到仿真画面。日志里出现 `fresh actions received`、`network_actions` 持续增长，说明你的主臂动作已经传进仿真了。
+启动后仿真会**加载任务场景**、等待你的主臂动作，并把画面串流到网页。命令跑起来后，在**你的浏览器**打开下面自动生成的仿真链接查看画面；日志出现 `fresh actions received`、`network_actions` 持续增长，说明主臂动作已传进仿真。
 
 ## 第四步：跟随检查与操作练习
 
