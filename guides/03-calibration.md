@@ -118,25 +118,31 @@ lerobot-calibrate \
 
 ## 检查校准结果
 
-校准文件会保存在缓存目录里（如 `~/.cache/huggingface/lerobot/calibration/`）。我们提供了一个检查脚本，能把你的校准结果和参考数据作对比，并读取当前关节位置验证是否在合法范围内。
+校准文件会保存在缓存目录里（如 `~/.cache/huggingface/lerobot/calibration/`）。我们提供了一个检查脚本，能把**主臂（leader）**或**从臂（follower）**的校准结果与参考数据作对比，并读取当前关节位置验证是否在合法范围内。
 
-1. 设置好环境变量后运行：
+- 检查**从臂**：读的是 `ROBOT_PORT` / `ROBOT_ID`，请先把从臂接好并用上面的步骤校准；
+- 检查**主臂**：读的是 `TELEOP_PORT` / `TELEOP_ID`，请先把主臂接好并用上面的步骤校准。
+
+1. 设置好环境变量后运行（按你要检查的臂二选一）：
 
 ```bash
-python ~/so101-lab/scripts/so101_check_calibration.py
+# 检查主臂（leader）
+python3 ~/so101-lab/scripts/so101_check_calibration.py --arm leader
+
+# 检查从臂（follower）
+python3 ~/so101-lab/scripts/so101_check_calibration.py --arm follower
 ```
 
-2. 看到输出类似：
+2. 看到输出类似（检查主臂时 `File:` 指向 `.../calibration/teleoperators/so101_leader/leader-sz03.json`；检查从臂时指向 `.../calibration/robots/so101_follower/follower-sz03.json`，其余结构相同）：
 
 ```
 ============================================================================
-  SO101 CALIBRATION CHECK REPORT  (leader)
-  ID:    R07252801
-  File:  .../calibration/teleoperators/so101_leader/R07252801.json
+  SO101 CALIBRATION CHECK REPORT
+  File:  .../calibration/robots/so101_follower/follower-sz03.json
   Stats: .../so101-lab/scripts/calibration_stats.json
 ============================================================================
 
-[1] Motion Range vs Stats (threshold ±2.0σ)
+[1] Motion Range vs Stats (threshold ±2.0σ, gripper ±8.0σ)
 
   Joint               Range     Mean    Std  Deviation    Offset  Status
   --------------------------------------------------------------------------

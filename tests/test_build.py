@@ -17,5 +17,5 @@ class BuildTest(unittest.TestCase):
   self.assertIn('5V',recipes['02-setup']['html'])
   self.assertIn('calibration_pose.jpg',recipes['03-calibration']['html'])
   self.assertIn('wrist_center.jpg',recipes['03-calibration']['html'])
-  self.assertIn('尚未完整跑通',recipes['05-sim-teleop']['html'])
+  self.assertIn('理解即可',recipes['05-sim-teleop']['html'])
 if __name__=='__main__': unittest.main()

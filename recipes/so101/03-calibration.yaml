@@ -18,12 +18,18 @@ steps:
     \ --robot.id={{robotId}}"
 - title: 校准结果检查
   where: 本机 · 客户端容器
-  note: 此辅助脚本检查从臂，使用 ROBOT_ID / ROBOT_PORT 和参考统计；主臂检查需通过校准日志及小幅跟随实测确认。
+  note: 辅助脚本可检查主臂或从臂：主臂加 --arm leader（用 TELEOP_ID / TELEOP_PORT），从臂用默认命令（用 ROBOT_ID / ROBOT_PORT），均与参考统计对比。
   command: 'export TELEOP_PORT={{teleop}} TELEOP_ID={{teleopId}}
 
     export ROBOT_PORT={{robot}} ROBOT_ID={{robotId}}
 
-    python /root/so101-lab/scripts/so101_check_calibration.py'
+    # 检查主臂（leader）
+
+    python3 /root/so101-lab/scripts/so101_check_calibration.py --arm leader
+
+    # 检查从臂（follower）
+
+    python3 /root/so101-lab/scripts/so101_check_calibration.py --arm follower'
 
 prerequisite_courses: ["02-setup"]
 recommended_courses: []

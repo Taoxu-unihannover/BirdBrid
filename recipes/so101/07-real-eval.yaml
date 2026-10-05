@@ -12,7 +12,7 @@ steps:
 - title: 启动真机评估
   where: 本机 · 客户端容器
   note: 客户端镜像必须包含 GR00T PolicyClient、LeRobot 和相关依赖；先观察初始姿态与首步动作。
-  command: "cd /root/so101-lab/scripts\npython so101_eval.py --robot.type=so101_follower\
+  command: "cd /root/so101-lab/scripts\npython3 so101_eval.py --robot.type=so101_follower\
     \ \\\n  --robot.port={{robot}} --robot.id={{robotId}} \\\n  --robot.cameras={{cameras}}\
     \ \\\n  --policy_host={{host}} --policy_port={{port}} \\\n  --lang_instruction=\"\
     Pick up the vial and place it in the yellow rack\" --rerun True"

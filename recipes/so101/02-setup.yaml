@@ -12,14 +12,13 @@ steps:
 - title: 启动客户端
   where: 本机 · 宿主机
   note: 离线镜像由教师提供。已有容器时用 sudo docker start so101-client，不要重复创建。
-  command: "mkdir -p ~/so101-lab/scripts\ncp ~/so101-lab/BridSimReal/runtime/* ~/so101-lab/scripts/\n\
-    sudo docker run -d --name so101-client --privileged\
-    \ --network host \\\n  -v ~/so101-lab:/root/so101-lab \\\n  -v ~/.cache/huggingface:/root/.cache/huggingface\
+  command: "sudo docker run -d --name so101-client --privileged\
+    \ --network host \\\n  -v /dev:/dev \\\n  -v ~/so101-lab:/root/so101-lab \\\n  -v ~/.cache/huggingface:/root/.cache/huggingface\
     \ \\\n  so101-client:latest sleep infinity"
 - title: 进入容器
   where: 本机 · 宿主机
-  note: ''
-  command: sudo docker exec -it so101-client bash
+  note: 用 -w 直接落在容器内工作目录 ~/so101-lab，与宿主机同目录同步。
+  command: sudo docker exec -it -w /root/so101-lab so101-client bash
 - title: 识别硬件
   where: 本机 · 客户端容器
   note: 识别后把实际结果填写到场景面板；不要直接沿用默认校准 ID。

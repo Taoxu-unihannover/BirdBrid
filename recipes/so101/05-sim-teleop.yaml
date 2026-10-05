@@ -12,20 +12,49 @@ steps:
   command: 'cd /root/so101-lab/scripts
 
     python3 -u leader_server.py --serial {{teleop}} --calibration {{calibration}}
-    --port 18766'
+    --port {{tunnel}}'
+- title: 登录服务器宿主机
+  where: 本机 · 终端（SSH）
+  note: 用你的工位 ID 作为 SSH 账号登录；地址取首页「集中服务器 IP / 主机名」。登录后，以下建立隧道与启动容器的命令都在服务器宿主机上执行。
+  command: ssh {{station}}@{{server}}
+  modes:
+  - remote
 - title: 建立主臂隧道
   where: '{compute} · 宿主机'
-  note: 在服务器宿主机执行，连接学员笔记本；同一服务器上的每个工位需不同隧道端口。
+  note: 在服务器宿主机执行，连接你的笔记本；同一服务器上的每个工位使用各自不同的隧道端口。
   command: "ssh -N -o ExitOnForwardFailure=yes -o ServerAliveInterval=10 \\\n  -o\
-    \ ServerAliveCountMax=3 -L 127.0.0.1:{{tunnel}}:127.0.0.1:18766 {{user}}@{{client}}"
+    \ ServerAliveCountMax=3 -L 127.0.0.1:{{tunnel}}:127.0.0.1:{{tunnel}} {{user}}@{{client}}"
+  modes:
+  - remote
+- title: 启动仿真容器
+  where: '{compute} · 宿主机'
+  note: 每个工位启动一个只属于自己的仿真容器，容器名按工位自动错开；挂载宿主机源码让教师修复即时生效，无需重建镜像。主臂直插服务器 USB 时改用镜像 so101-sim:usb。多工位 WebRTC 信令/媒体端口隔离需要教师按工位构建仿真镜像，参见《服务器部署与复现》。必须设置 PUBLIC_IP 为集中服务器对外可达 IP，否则远程浏览器/客户端拿到 SDP 后会去 127.0.0.1 取媒体流，表现为点连接后黑屏。
+  command: "sudo docker run -d --name so101-sim-{{station}} \\\n  --privileged --network\
+    \ host --runtime nvidia -v /dev:/dev -e PUBLIC_IP={{server}} \\\n  -v {{simSource}}:/workspace/Sim-to-Real-SO-101-Workshop/source\
+    \ \\\n  --entrypoint bash so101-sim:network -c \"echo started && sleep infinity\""
+  modes:
+  - remote
+- title: 启动网页容器
+  where: '{compute} · 宿主机'
+  note: 启动属于你的网页查看器容器，浏览器端口按工位自动推导；查看器镜像默认监听 8210，这里通过覆盖启动命令让它监听属于你的端口。
+  command: "sudo docker run -d --name so101-web-{{station}} --network host \\\n  so101-viewer\
+    \ sh -c \"./node_modules/.bin/vite preview --host --port {{viewer}}\""
+  modes:
+  - remote
+- title: 进入仿真容器
+  where: '{compute} · 仿真容器'
+  note: 进入属于你的仿真容器，然后在容器内启动仿真。
+  command: sudo docker exec -it so101-sim-{{station}} bash
   modes:
   - remote
 - title: 启动仿真
-  where: '{compute} · 已准备的仿真容器'
-  note: 集中模式使用教师分配的隧道端口；仿真镜像需支持网络输入。
+  where: '{compute} · 仿真容器'
+  note: 集中模式读取隧道转发的动作；启动时直接带录制参数，按 S 录制、C 取消、R 重置。日志出现 fresh actions received、network_actions 持续增长，说明主臂动作已进入仿真。
   command: "cd /workspace/Sim-to-Real-SO-101-Workshop\n/isaac-sim/python.sh -m sim_to_real_so101.scripts.lerobot_agent\
-    \ \\\n  --task Lerobot-So101-Teleop-Vials-To-Rack --num_envs 1 \\\n  --robot_id\
-    \ {{robotId}} --headless --livestream 1 --leader_tcp_port {{tunnel}}"
+    \ \\\n  --task Lerobot-So101-Teleop-Vials-To-Rack-DR --num_envs 1 \\\n  --robot_id\
+    \ {{robotId}} --livestream 1 --leader_tcp_port {{tunnel}} \\\n  --repo_id\
+    \ {{station}}/so101_teleop_vials \\\n  --repo_root \"$(pwd)/datasets/recorded/so101_teleop_vials\"\
+    \ \\\n  --task_name \"Pick up the vial and place it in the rack\""
   modes:
   - remote
 - title: 启动本机仿真
@@ -33,12 +62,12 @@ steps:
   note: 本机使用 network 镜像和 host 网络，直接连接主臂服务，不需要 SSH 隧道。需兼容的 NVIDIA GPU 和已部署的 Isaac Sim。
   command: "cd /workspace/Sim-to-Real-SO-101-Workshop\n/isaac-sim/python.sh -m sim_to_real_so101.scripts.lerobot_agent\
     \ \\\n  --task Lerobot-So101-Teleop-Vials-To-Rack --num_envs 1 \\\n  --robot_id\
-    \ {{robotId}} --headless --livestream 1 --leader_tcp_port 18766"
+    \ {{robotId}} --livestream 1 --leader_tcp_port {{tunnel}}"
   modes:
   - local
 - title: 观看与跟随检查
   where: 本机 · 浏览器
-  note: 使用下方仿真入口。逐轴小幅移动，按 R 重置。多工位串流必须由教师配置匹配的 Isaac Sim 信令/媒体端口，网页端口本身不提供隔离。
+  note: 用浏览器（如 Chrome）访问查看器端口观看与操作，无需安装本地客户端；本地 Isaac Sim WebRTC Streaming Client 必须与服务器 Isaac Sim 版本一致，否则点连接后黑屏。逐轴小幅移动，按 R 重置。多工位靠每个工位独立的仿真与查看器容器、以及按工位错开的网页端口实现隔离；WebRTC 信令 / 媒体端口隔离需要教师按工位构建镜像。
 - title: 数据采集边界
   where: 阅读课程
   note: 原课程 POC 只验证遥操作观看与跟随；录制、转换数据集、训练的完整闭环尚未验证，按教师指引进行。

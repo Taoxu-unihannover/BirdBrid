@@ -32,7 +32,7 @@
 打开终端（或按教师配备的环境进入），运行评估脚本：
 
 ```bash
-python so101_eval.py \
+python3 so101_eval.py \
     --robot.type=so101_follower \
     --robot.port="$ROBOT_PORT" \
     --robot.id="$ROBOT_ID" \

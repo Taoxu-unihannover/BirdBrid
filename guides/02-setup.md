@@ -53,19 +53,17 @@ USB 只负责「通信」，**电机需要单独的电源才有力气动**。如
 
 
 ```bash
-# 1) 建一个工作目录，本课程所有内容都放这里，避免散落在 home 目录下
-mkdir -p ~/so101-lab/scripts
-cp ~/so101-lab/BridSimReal/runtime/* ~/so101-lab/scripts/
-
-# 2) 启动客户端容器（每次开机后启动一次即可）
+# 启动客户端容器（每次开机后启动一次即可）
 sudo docker run -d --name so101-client \
   --privileged --network host \
+  -v /dev:/dev \
   -v ~/so101-lab:/root/so101-lab \
   -v ~/.cache/huggingface:/root/.cache/huggingface \
   so101-client:latest sleep infinity
 ```
 
 - `--privileged --network host`：让容器能访问你的 USB 串口和相机。
+- `-v /dev:/dev`：把宿主机 `/dev` 实时共享进容器，USB 插拔时设备节点才会同步消失/出现。
 - `-v ~/so101-lab:/root/so101-lab`：把你本机的工作目录挂进容器；容器里的 `~/so101-lab` 和本机是**同一个目录**。
 - `-v ~/.cache/huggingface:/root/.cache/huggingface`：对齐校准文件的存放位置，容器内外校准结果一致。
 
@@ -74,10 +72,10 @@ sudo docker run -d --name so101-client \
 本节之后的命令，都在容器里执行
 
 ```bash
-sudo docker exec -it so101-client bash
+sudo docker exec -it -w /root/so101-lab so101-client bash
 ```
 
-进入后提示符会变成容器里的 shell。敲 `lerobot --help` 或 `lerobot-find-cameras opencv` 验证一下环境可用。
+`-w /root/so101-lab` 让容器一进来就落在工作目录里：容器内 root 的家目录是 `/root`，所以 `/root/so101-lab` 就是容器里的 `~/so101-lab`，和宿主机是同一个目录。进入后提示符会变成容器里的 shell，路径显示为 `~/so101-lab`，敲 `ls` 能看到和本机 `~/so101-lab` 一致的内容。敲 `lerobot --help` 或 `lerobot-find-cameras opencv` 验证一下环境可用。
 
 ## 第三步：找到主臂和从臂的串口
 
@@ -102,15 +100,15 @@ crw-rw---- 1 root dialout 166, 1  9月 28 10:00 /dev/ttyACM1
 lerobot-find-port
 ```
 
-它会让你**拔掉其中一条 USB 线再按回车**，从而判断哪条线对应哪个设备。跟着提示做，记下结果：
+它会让你**拔掉其中一条 USB 数据线（不是电源线）再按回车**，从而判断哪条线对应哪个设备。这个工具一次只能识别一条线：先 `ls` 看到两个端口，跑一遍 `lerobot-find-port`，只拔掉你准备分配给主臂的那条 USB 数据线，它报消失的端口就是主臂端口，剩下的那条自然是从臂。跟着提示做，记下结果：
 
 ```bash
 # 记住这两个值（示例，按你的实际输出改）
 export TELEOP_PORT=/dev/ttyACM0   # 主臂（leader）
-export TELEOP_ID=R07252801        # 主臂的校准 ID
+export TELEOP_ID=leader-sz03      # 主臂的校准 ID
 
 export ROBOT_PORT=/dev/ttyACM1    # 从臂（follower）
-export ROBOT_ID=R07252801         # 从臂的校准 ID（每台臂独立）
+export ROBOT_ID=follower-sz03     # 从臂的校准 ID（每台臂独立）
 ```
 
 :::{tip}

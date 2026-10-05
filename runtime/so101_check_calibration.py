@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # SPDX-FileCopyrightText: Copyright (c) 2026 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 #
@@ -14,24 +14,31 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 """
-Calibration quality check for the SO101 follower robot.
+Calibration quality check for the SO101 follower robot and leader teleoperator.
 
 Verifies two things:
   1. Static check  — each joint's calibrated range (in raw encoder counts) is
                      within expected physical bounds for the SO101.
   2. Live check    — the current encoder position of each joint is within its
-                     calibrated range (requires robot to be connected).
+                     calibrated range (requires the arm to be connected).
 
 The STS3215 encoder has 4096 counts per full revolution, but joints cannot
 physically rotate 360°, so encoder counts are used directly rather than
 converting to degrees.
 
 Usage (inside the teleop container):
+    # Follower (default)
     export ROBOT_PORT=/dev/ttyACM0
     export ROBOT_ID=follower_arm_1
-    python real_robot/so101_check_calibration.py
+    python3 real_robot/so101_check_calibration.py
+
+    # Leader
+    export TELEOP_PORT=/dev/ttyACM0
+    export TELEOP_ID=leader_arm_1
+    python3 real_robot/so101_check_calibration.py --arm leader
 """
 
+import argparse
 import json
 import logging
 import os
@@ -41,6 +48,8 @@ import draccus
 from lerobot.motors.motors_bus import MotorCalibration
 from lerobot.robots import make_robot_from_config
 from lerobot.robots.so101_follower import SO101FollowerConfig
+from lerobot.teleoperators import make_teleoperator_from_config
+from lerobot.teleoperators.so101_leader import SO101LeaderConfig
 from lerobot.utils.constants import HF_LEROBOT_CALIBRATION
 from lerobot.utils.utils import init_logging
 
@@ -49,6 +58,10 @@ DEFAULT_STATS_PATH = Path(__file__).parent / "calibration_stats.json"
 
 # Number of standard deviations outside the mean before flagging a WARN
 N_STD = 2.0
+
+# The gripper's motion range differs between the leader teleop handle and the
+# follower end-effector, so use a looser threshold for that joint only.
+N_STD_GRIPPER = 8.0
 
 # Warn if |homing_offset| exceeds this (raw counts).
 HOMING_OFFSET_WARN = 2048
@@ -81,10 +94,11 @@ def static_check(calibration: dict[str, MotorCalibration], stats: dict) -> list[
             mean, std = s["mean"], s["std"]
             deviation = motion_range - mean
             deviation_std = deviation / std if std > 0 else 0.0
-            if abs(deviation_std) > N_STD:
+            threshold = N_STD_GRIPPER if joint == "gripper" else N_STD
+            if abs(deviation_std) > threshold:
                 issues.append(
                     f"motion range {motion_range} deviates {deviation_std:+.1f}σ from mean "
-                    f"(mean={mean:.0f}, std={std:.0f}, threshold=±{N_STD}σ)"
+                    f"(mean={mean:.0f}, std={std:.0f}, threshold=±{threshold:.0f}σ)"
                 )
 
         if abs(calib.homing_offset) > HOMING_OFFSET_WARN:
@@ -106,9 +120,9 @@ def static_check(calibration: dict[str, MotorCalibration], stats: dict) -> list[
     return results
 
 
-def live_check(robot, calibration: dict[str, MotorCalibration]) -> list[dict]:
+def live_check(device, calibration: dict[str, MotorCalibration]) -> list[dict]:
     """Read live encoder positions and check they are within the calibrated range."""
-    raw = robot.bus.sync_read("Present_Position", normalize=False)
+    raw = device.bus.sync_read("Present_Position", normalize=False)
     results = []
     for joint, pos in raw.items():
         calib = calibration.get(joint)
@@ -141,7 +155,7 @@ def print_report(
     print("=" * W)
 
     # --- Static check ---
-    print(f"\n[1] Motion Range vs Stats (threshold ±{N_STD}σ)\n")
+    print(f"\n[1] Motion Range vs Stats (threshold ±{N_STD}σ, gripper ±{N_STD_GRIPPER}σ)\n")
     header = (
         f"  {'Joint':<18} {'Range':>6}  {'Mean':>7} {'Std':>6} {'Deviation':>10}  "
         f"{'Offset':>8}  Status"
@@ -181,7 +195,7 @@ def print_report(
                 f"{flag} {'OK' if r['in_range'] else 'OUT OF RANGE'}"
             )
     else:
-        print("\n[2] Live check skipped (robot not connected)\n")
+        print("\n[2] Live check skipped (arm not connected)\n")
 
     print("\n" + "=" * W)
     verdict = "✓ PASS — calibration looks good." if all_pass else "⚠ WARN — review the issues above."
@@ -196,12 +210,29 @@ def print_report(
 def main():
     init_logging()
 
-    robot_id = os.getenv("ROBOT_ID", "follower_arm_1")
-    calib_path = HF_LEROBOT_CALIBRATION / "robots" / "so101_follower" / f"{robot_id}.json"
+    parser = argparse.ArgumentParser(description="Calibration quality check for the SO101 arm.")
+    parser.add_argument(
+        "--arm",
+        choices=["leader", "follower"],
+        default="follower",
+        help="Which arm to check (default: follower).",
+    )
+    args = parser.parse_args()
+
+    if args.arm == "leader":
+        arm_id = os.getenv("TELEOP_ID", "leader_arm_1")
+        arm_port = os.getenv("TELEOP_PORT", "/dev/ttyACM0")
+        calib_path = HF_LEROBOT_CALIBRATION / "teleoperators" / "so101_leader" / f"{arm_id}.json"
+        id_env = "TELEOP_ID"
+    else:
+        arm_id = os.getenv("ROBOT_ID", "follower_arm_1")
+        arm_port = os.getenv("ROBOT_PORT", "/dev/ttyACM0")
+        calib_path = HF_LEROBOT_CALIBRATION / "robots" / "so101_follower" / f"{arm_id}.json"
+        id_env = "ROBOT_ID"
 
     if not calib_path.exists():
         logging.error(f"Calibration file not found: {calib_path}")
-        logging.error("Run `lerobot-calibrate` first, or set ROBOT_ID correctly.")
+        logging.error(f"Run `lerobot-calibrate` first, or set {id_env} correctly.")
         return
 
     stats_path = Path(os.getenv("STATS_JSON", DEFAULT_STATS_PATH))
@@ -219,22 +250,23 @@ def main():
 
     # Try to connect for live position check (cameras not needed)
     live_results = []
-    robot = None
+    device = None
     try:
-        config = SO101FollowerConfig(
-            port=os.getenv("ROBOT_PORT", "/dev/ttyACM0"),
-            id=robot_id,
-        )
-        robot = make_robot_from_config(config)
-        robot.connect(calibrate=False)
-        logging.info("Robot connected — reading live encoder positions")
-        live_results = live_check(robot, calibration)
+        if args.arm == "leader":
+            config = SO101LeaderConfig(port=arm_port, id=arm_id)
+            device = make_teleoperator_from_config(config)
+        else:
+            config = SO101FollowerConfig(port=arm_port, id=arm_id)
+            device = make_robot_from_config(config)
+        device.connect(calibrate=False)
+        logging.info("Arm connected — reading live encoder positions")
+        live_results = live_check(device, calibration)
     except Exception as e:
-        logging.warning(f"Could not connect to robot: {e}")
+        logging.warning(f"Could not connect to arm: {e}")
         logging.warning("Skipping live check — showing file-only report")
     finally:
-        if robot is not None and robot.is_connected:
-            robot.disconnect()
+        if device is not None and device.is_connected:
+            device.disconnect()
 
     print_report(calib_path, stats_path, static_results, live_results)
 
