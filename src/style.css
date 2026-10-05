@@ -14,3 +14,5 @@
 /* Collapse the sidebar automatically when the reading area becomes narrow. */
 .compact-course-nav{display:none}
 @media(max-width:1000px){.lesson-layout{display:block}.lesson-layout .lesson-nav{display:none}.compact-course-nav{display:flex;align-items:center;gap:14px;color:var(--muted);font-size:12px;margin:0 0 24px}.compact-course-nav select{width:auto;max-width:100%;flex:1;background:white}}
+
+.hero p.hero-promise{color:#ed2638;font-size:18px;font-weight:650;letter-spacing:.2px}

@@ -1,1 +1,24 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 64"><defs><linearGradient id="rainbow"><stop stop-color="#eb6565"/><stop offset=".3" stop-color="#e8aa36"/><stop offset=".55" stop-color="#44a575"/><stop offset=".78" stop-color="#368bc1"/><stop offset="1" stop-color="#8962b4"/></linearGradient></defs><path d="M4 49 C4 -5 94 -5 94 49" fill="none" stroke="url(#rainbow)" stroke-width="3.5" stroke-linecap="round"/><path d="M3 54H95M9 38V54M89 38V54" fill="none" stroke="url(#rainbow)" stroke-width="2" stroke-linecap="round"/><text x="49" y="47" text-anchor="middle" textLength="66" lengthAdjust="spacingAndGlyphs" font-family="Arial,sans-serif" font-size="32" font-weight="800" fill="url(#rainbow)">Brid</text><text x="101" y="47" font-family="Arial,sans-serif" font-size="32" font-weight="700" letter-spacing="-1" fill="#202935">SimReal</text></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 250 64" role="img" aria-labelledby="title desc">
+  <title id="title">BirdBrid</title>
+  <desc id="desc">彩色鹊鸟相向飞来，组成拱形鹊桥；桥下是清晰居中的 BirdBrid 字标。</desc>
+  <defs>
+    <linearGradient id="bridge" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#e66e65"/><stop offset=".24" stop-color="#e9aa41"/>
+      <stop offset=".49" stop-color="#46a781"/><stop offset=".74" stop-color="#3c9bbb"/><stop offset="1" stop-color="#8c6bbe"/>
+    </linearGradient>
+    <linearGradient id="word" x1="0" y1="0" x2="1" y2="0">
+      <stop stop-color="#254b51"/><stop offset=".5" stop-color="#237e80"/><stop offset="1" stop-color="#66518c"/>
+    </linearGradient>
+    <g id="magpie">
+      <path d="M-16 7 -5 0 Q-9-5-10-12 Q0-10 4-3 Q8-8 13-5 Q17-4 16 0 L21 2 15 3 Q11 10 2 7 L-13 14 -8 6Z" fill="currentColor"/>
+      <path d="M-4-4 Q0-4 6 2 Q2 6-2 4Z" fill="#fff" opacity=".92"/>
+      <circle cx="12" cy="-2" r="1" fill="#fff"/>
+    </g>
+  </defs>
+  <path d="M19 32 Q125-10 231 32" fill="none" stroke="url(#bridge)" stroke-width="3" stroke-linecap="round"/>
+  <path d="M27 32 Q125 0 223 32" fill="none" stroke="url(#bridge)" stroke-width="1.3" opacity=".35"/>
+  <use href="#magpie" transform="translate(67 17) rotate(-12) scale(.72)" color="#dd9150"/>
+  <use href="#magpie" transform="translate(183 17) rotate(12) scale(-.72 .72)" color="#678fc0"/>
+  <path d="m123 6 2-3 2 3-2 3Z" fill="#4ca987"/>
+  <text x="125" y="58" text-anchor="middle" textLength="185" lengthAdjust="spacingAndGlyphs" font-family="Inter,Arial,sans-serif" font-size="36" font-weight="800" letter-spacing="-.6" fill="url(#word)">BirdBrid</text>
+</svg>
