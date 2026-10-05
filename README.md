@@ -1,4 +1,4 @@
-# BridSimReal
+# BirdBrid
 
 面向机器人实训的场景化 Recipes 项目。现有 SO-101 课程已经迁为 10 个课程卡片：选择工位、算力部署方式、串口和相机后，为当前场景生成可复制的操作命令。
 
@@ -7,7 +7,7 @@
 需要 Python 3.10+；Node.js 20+ 用于测试和 npm 快捷命令。网站本身不需要 Node 服务，不使用 CDN、在线字体或数据库。
 
 ```bash
-cd BridSimReal
+cd BirdBrid
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install -r requirements.txt
@@ -77,7 +77,7 @@ npm test
 
 ## 后续发布 GitHub
 
-本地目录已初始化为独立 Git 仓库，当前没有远程仓库，也没有推送。确定公开范围与素材授权后，在 GitHub 创建名为 `BridSimReal` 的仓库并添加 remote 即可。
+本地目录已初始化为独立 Git 仓库，当前没有远程仓库，也没有推送。确定公开范围与素材授权后，在 GitHub 创建名为 `BirdBrid` 的仓库并添加 remote 即可。
 
 仓库自带 CI 构建测试，以及手动触发的 Pages 工作流。启用仓库 Settings → Pages → Source: GitHub Actions 后，在 Actions 中运行 `Deploy Pages`。本阶段不会自动公开网站。
 

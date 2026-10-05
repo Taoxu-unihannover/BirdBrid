@@ -14,7 +14,7 @@ steps:
   note: ''
   command: 'mkdir -p ~/so101-lab/scripts
 
-    cp ~/so101-lab/BridSimReal/runtime/* ~/so101-lab/scripts/'
+    cp ~/so101-lab/BirdBrid/runtime/* ~/so101-lab/scripts/'
 - title: 启动推理容器
   where: '{compute} · 宿主机'
   note: 高级配置中的宿主机模型目录必须真实存在，挂载到 /workspace/models。镜像必须包含 GR00T 环境和模型依赖。
